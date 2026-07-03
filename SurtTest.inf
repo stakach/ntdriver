@@ -11,6 +11,12 @@ CatalogFile=SurtTest.cat
 [DestinationDirs]
 DefaultDestDir = 12
 
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+SurtTest.sys = 1
+
 [Manufacturer]
 %ManufacturerName%=Standard,NTamd64
 
@@ -38,3 +44,4 @@ ProviderName="SurtTest"
 ManufacturerName="SurtTest"
 DeviceName="SurtTest Legacy WDM Test Driver"
 ServiceName="SurtTest"
+DiskName="SurtTest Installation Disk"
