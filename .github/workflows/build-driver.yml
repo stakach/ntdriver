@@ -1,4 +1,4 @@
-name: Build SurtTest Driver
+name: Build Test Drivers
 
 on:
   push:
@@ -9,6 +9,15 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: SurtTest
+            dir: surt_test_driver
+          - name: AsyncTest
+            dir: async_test_driver
 
     env:
       CONFIGURATION: Release
@@ -28,10 +37,10 @@ jobs:
         shell: pwsh
         run: choco install windowsdriverkit11 --no-progress -y
 
-      - name: Build driver
+      - name: Build ${{ matrix.name }}
         shell: pwsh
         run: |
-          msbuild SurtTest.vcxproj `
+          msbuild "${{ matrix.dir }}\${{ matrix.name }}.vcxproj" `
             /nologo `
             /m `
             /p:Configuration=$env:CONFIGURATION `
@@ -45,9 +54,9 @@ jobs:
         id: out
         shell: pwsh
         run: |
-          $sys = Get-ChildItem -Recurse -Filter SurtTest.sys |
+          $sys = Get-ChildItem -Path "${{ matrix.dir }}" -Recurse -Filter "${{ matrix.name }}.sys" |
             Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          if (-not $sys) { throw "SurtTest.sys not found after build" }
+          if (-not $sys) { throw "${{ matrix.name }}.sys not found after build" }
           $dir = $sys.DirectoryName
           Write-Host "Build output directory: $dir"
           Get-ChildItem $dir | Format-Table Name,Length
@@ -60,9 +69,9 @@ jobs:
         run: |
           $pkg = Join-Path $env:GITHUB_WORKSPACE 'package'
           New-Item -ItemType Directory -Force -Path $pkg | Out-Null
-          Copy-Item "${{ steps.out.outputs.dir }}\SurtTest.sys" $pkg
-          Copy-Item "${{ steps.out.outputs.dir }}\SurtTest.pdb" $pkg -ErrorAction SilentlyContinue
-          Copy-Item "SurtTest.inf" $pkg
+          Copy-Item "${{ steps.out.outputs.dir }}\${{ matrix.name }}.sys" $pkg
+          Copy-Item "${{ steps.out.outputs.dir }}\${{ matrix.name }}.pdb" $pkg -ErrorAction SilentlyContinue
+          Copy-Item "${{ matrix.dir }}\${{ matrix.name }}.inf" $pkg
 
           $inf2cat = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter Inf2Cat.exe |
             Sort-Object FullName -Descending | Select-Object -First 1
@@ -80,7 +89,7 @@ jobs:
         run: |
           $pkg = Join-Path $env:GITHUB_WORKSPACE 'package'
           $cert = New-SelfSignedCertificate `
-            -Subject "CN=SurtTest Test Cert" `
+            -Subject "CN=${{ matrix.name }} Test Cert" `
             -Type CodeSigningCert `
             -KeyUsage DigitalSignature `
             -CertStoreLocation Cert:\CurrentUser\My `
@@ -94,20 +103,20 @@ jobs:
 
           & $signtool.FullName sign /fd SHA256 /sha1 $cert.Thumbprint `
             /t http://timestamp.digicert.com `
-            "$pkg\SurtTest.sys" "$pkg\SurtTest.cat"
+            "$pkg\${{ matrix.name }}.sys" "$pkg\${{ matrix.name }}.cat"
           if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE" }
 
           # Export the public cert so it can be imported on a test machine.
-          Export-Certificate -Cert $cert -FilePath "$pkg\SurtTest.cer" | Out-Null
+          Export-Certificate -Cert $cert -FilePath "$pkg\${{ matrix.name }}.cer" | Out-Null
 
-      - name: Upload artifacts
+      - name: Upload ${{ matrix.name }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SurtTest-driver
+          name: ${{ matrix.name }}-driver
           path: |
-            package/SurtTest.sys
-            package/SurtTest.pdb
-            package/SurtTest.inf
-            package/SurtTest.cat
-            package/SurtTest.cer
+            package/${{ matrix.name }}.sys
+            package/${{ matrix.name }}.pdb
+            package/${{ matrix.name }}.inf
+            package/${{ matrix.name }}.cat
+            package/${{ matrix.name }}.cer
           if-no-files-found: error

@@ -1,0 +1,50 @@
+; AsyncTest.inf - optional installation file.
+;
+; Not required for userspace-ntos Driver Host testing.
+; For real Windows, `sc create type= kernel` is often simpler for this legacy test driver.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/03/2026,0.1.0.0
+CatalogFile=AsyncTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+AsyncTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\AsyncTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+AsyncTest.sys
+
+[Install.NT.Services]
+AddService=AsyncTest,0x00000002,AsyncTest_Service
+
+[AsyncTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\AsyncTest.sys
+
+[Strings]
+ProviderName="AsyncTest"
+ManufacturerName="AsyncTest"
+DeviceName="AsyncTest Legacy WDM Async Test Driver"
+ServiceName="AsyncTest"
+DiskName="AsyncTest Installation Disk"
