@@ -332,7 +332,7 @@ PnpitFindTranslatedResources(
     _Out_ PULONG Vector,
     _Out_ PKIRQL Level,
     _Out_ PKAFFINITY Affinity,
-    _Out_ PKINTERRUPT_MODE Mode
+    _Out_ KINTERRUPT_MODE *Mode
 )
 {
     ULONG full_index;
