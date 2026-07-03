@@ -1,0 +1,25 @@
+# Windows "downloaded from internet" alternate-data-stream markers
+*:Zone.Identifier
+
+# MSBuild / WDK build output
+[Xx]64/
+[Dd]ebug/
+[Rr]elease/
+*.sys
+*.pdb
+*.cat
+*.cer
+*.obj
+*.exe
+*.log
+*.tlog
+*.lastbuildstate
+*.idb
+*.ipdb
+*.iobj
+package/
+
+# Visual Studio user files
+*.suo
+*.user
+.vs/

@@ -1,0 +1,113 @@
+name: Build SurtTest Driver
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    env:
+      CONFIGURATION: Release
+      PLATFORM: x64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      # GitHub's windows-2022 image ships Visual Studio 2022 but NOT the WDK.
+      # The Chocolatey package installs the WDK and registers the Visual Studio
+      # driver-build extension so the WindowsKernelModeDriver10.0 toolset resolves.
+      - name: Install Windows Driver Kit
+        shell: pwsh
+        run: choco install windowsdriverkit11 --no-progress -y
+
+      - name: Build driver
+        shell: pwsh
+        run: |
+          msbuild SurtTest.vcxproj `
+            /nologo `
+            /m `
+            /p:Configuration=$env:CONFIGURATION `
+            /p:Platform=$env:PLATFORM `
+            /p:SpectreMitigation=false `
+            /p:SignMode=Off
+        # SpectreMitigation=false avoids requiring the Spectre-mitigated CRT libs.
+        # SignMode=Off skips MSBuild's package-signing step; we test-sign below.
+
+      - name: Locate build output
+        id: out
+        shell: pwsh
+        run: |
+          $sys = Get-ChildItem -Recurse -Filter SurtTest.sys |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $sys) { throw "SurtTest.sys not found after build" }
+          $dir = $sys.DirectoryName
+          Write-Host "Build output directory: $dir"
+          Get-ChildItem $dir | Format-Table Name,Length
+          "dir=$dir" >> $env:GITHUB_OUTPUT
+
+      # Assemble a clean package directory: driver binary + INF, then generate
+      # the security catalog (.cat) from the INF with the WDK's Inf2Cat tool.
+      - name: Generate catalog (.cat)
+        shell: pwsh
+        run: |
+          $pkg = Join-Path $env:GITHUB_WORKSPACE 'package'
+          New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+          Copy-Item "${{ steps.out.outputs.dir }}\SurtTest.sys" $pkg
+          Copy-Item "${{ steps.out.outputs.dir }}\SurtTest.pdb" $pkg -ErrorAction SilentlyContinue
+          Copy-Item "SurtTest.inf" $pkg
+
+          $inf2cat = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter Inf2Cat.exe |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $inf2cat) { throw "Inf2Cat.exe not found" }
+          Write-Host "Using $($inf2cat.FullName)"
+
+          & $inf2cat.FullName /driver:$pkg /os:10_x64 /verbose
+          if ($LASTEXITCODE -ne 0) { throw "Inf2Cat failed with exit code $LASTEXITCODE" }
+
+      # Test-sign the .sys and .cat with an ephemeral self-signed certificate.
+      # This is a TEST driver: the signature is not trusted by Windows unless the
+      # cert is imported and test-signing is enabled (bcdedit /set testsigning on).
+      - name: Test-sign artifacts
+        shell: pwsh
+        run: |
+          $pkg = Join-Path $env:GITHUB_WORKSPACE 'package'
+          $cert = New-SelfSignedCertificate `
+            -Subject "CN=SurtTest Test Cert" `
+            -Type CodeSigningCert `
+            -KeyUsage DigitalSignature `
+            -CertStoreLocation Cert:\CurrentUser\My `
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3")
+
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter signtool.exe |
+            Where-Object { $_.FullName -match 'x64' } |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found" }
+          Write-Host "Using $($signtool.FullName)"
+
+          & $signtool.FullName sign /fd SHA256 /sha1 $cert.Thumbprint `
+            /t http://timestamp.digicert.com `
+            "$pkg\SurtTest.sys" "$pkg\SurtTest.cat"
+          if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE" }
+
+          # Export the public cert so it can be imported on a test machine.
+          Export-Certificate -Cert $cert -FilePath "$pkg\SurtTest.cer" | Out-Null
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SurtTest-driver
+          path: |
+            package/SurtTest.sys
+            package/SurtTest.pdb
+            package/SurtTest.inf
+            package/SurtTest.cat
+            package/SurtTest.cer
+          if-no-files-found: error

@@ -1,0 +1,40 @@
+; Optional INF. Not required for userspace-ntos Driver Host testing.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/03/2026,0.1.0.0
+CatalogFile=SurtTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\SurtTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+SurtTest.sys
+
+[Install.NT.Services]
+AddService=SurtTest,0x00000002,SurtTest_Service
+
+[SurtTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\SurtTest.sys
+
+[Strings]
+ProviderName="SurtTest"
+ManufacturerName="SurtTest"
+DeviceName="SurtTest Legacy WDM Test Driver"
+ServiceName="SurtTest"
