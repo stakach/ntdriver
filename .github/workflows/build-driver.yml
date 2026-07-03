@@ -20,6 +20,8 @@ jobs:
             dir: async_test_driver
           - name: MmioInterruptTest
             dir: mmio_interrupt_test_driver
+          - name: PnpMmioInterruptTest
+            dir: pnp_mmio_interrupt_test_driver
 
     env:
       CONFIGURATION: Release
