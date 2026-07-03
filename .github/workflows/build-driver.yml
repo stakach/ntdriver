@@ -18,6 +18,8 @@ jobs:
             dir: surt_test_driver
           - name: AsyncTest
             dir: async_test_driver
+          - name: MmioInterruptTest
+            dir: mmio_interrupt_test_driver
 
     env:
       CONFIGURATION: Release

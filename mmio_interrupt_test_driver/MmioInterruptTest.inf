@@ -1,0 +1,51 @@
+; MmioInterruptTest.inf - optional installation file.
+;
+; Not required for userspace-ntos Driver Host testing.
+; For real Windows, loading this is not recommended unless you fully control the
+; fake physical resource and interrupt vector.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/03/2026,0.1.0.0
+CatalogFile=MmioInterruptTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+MmioInterruptTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\MmioInterruptTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+MmioInterruptTest.sys
+
+[Install.NT.Services]
+AddService=MmioInterruptTest,0x00000002,MmioInterruptTest_Service
+
+[MmioInterruptTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\MmioInterruptTest.sys
+
+[Strings]
+ProviderName="MmioInterruptTest"
+ManufacturerName="MmioInterruptTest"
+DeviceName="MmioInterruptTest Legacy WDM MMIO/Interrupt Test Driver"
+ServiceName="MmioInterruptTest"
+DiskName="MmioInterruptTest Installation Disk"
