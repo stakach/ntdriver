@@ -1,0 +1,56 @@
+; KmdfInterfaceRegistryTest.inf - optional installation file.
+;
+; Not required for userspace-ntos Driver Host testing.
+; Included as a convenience for WDK build/signing experiments.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/04/2026,0.1.0.0
+CatalogFile=KmdfInterfaceRegistryTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KmdfInterfaceRegistryTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\KmdfInterfaceRegistryTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+KmdfInterfaceRegistryTest.sys
+
+[Install.NT.Services]
+AddService=KmdfInterfaceRegistryTest,0x00000002,KmdfInterfaceRegistryTest_Service
+
+[KmdfInterfaceRegistryTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\KmdfInterfaceRegistryTest.sys
+
+[Install.NT.Wdf]
+KmdfService = KmdfInterfaceRegistryTest, KmdfInterfaceRegistryTest_wdfsect
+
+[KmdfInterfaceRegistryTest_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+ProviderName="KmdfInterfaceRegistryTest"
+ManufacturerName="KmdfInterfaceRegistryTest"
+DeviceName="KmdfInterfaceRegistryTest Interface Registry Runtime Test Driver"
+ServiceName="KmdfInterfaceRegistryTest"
+DiskName="KmdfInterfaceRegistryTest Installation Disk"

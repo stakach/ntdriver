@@ -30,6 +30,8 @@ jobs:
             dir: kmdf_basic_test_driver
           - name: KmdfDmaInterruptTest
             dir: kmdf_dma_interrupt_test_driver
+          - name: KmdfInterfaceRegistryTest
+            dir: kmdf_interface_registry_test_driver
 
     env:
       CONFIGURATION: Release
