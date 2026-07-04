@@ -1,0 +1,50 @@
+; DmaPnpPowerTest.inf - optional installation file.
+;
+; Not required for userspace-ntos Driver Host testing.
+; Included as a convenience for building/signing experiments.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/04/2026,0.1.0.0
+CatalogFile=DmaPnpPowerTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+DmaPnpPowerTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\DmaPnpPowerTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+DmaPnpPowerTest.sys
+
+[Install.NT.Services]
+AddService=DmaPnpPowerTest,0x00000002,DmaPnpPowerTest_Service
+
+[DmaPnpPowerTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\DmaPnpPowerTest.sys
+
+[Strings]
+ProviderName="DmaPnpPowerTest"
+ManufacturerName="DmaPnpPowerTest"
+DeviceName="DmaPnpPowerTest PnP Power DMA WDM Test Driver"
+ServiceName="DmaPnpPowerTest"
+DiskName="DmaPnpPowerTest Installation Disk"

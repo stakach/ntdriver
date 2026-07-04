@@ -24,6 +24,8 @@ jobs:
             dir: pnp_mmio_interrupt_test_driver
           - name: PowerPnpMmioTest
             dir: power_pnp_mmio_test_driver
+          - name: DmaPnpPowerTest
+            dir: dma_pnp_power_test_driver
 
     env:
       CONFIGURATION: Release
