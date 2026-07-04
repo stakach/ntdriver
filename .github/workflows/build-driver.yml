@@ -26,6 +26,8 @@ jobs:
             dir: power_pnp_mmio_test_driver
           - name: DmaPnpPowerTest
             dir: dma_pnp_power_test_driver
+          - name: KmdfBasicTest
+            dir: kmdf_basic_test_driver
 
     env:
       CONFIGURATION: Release

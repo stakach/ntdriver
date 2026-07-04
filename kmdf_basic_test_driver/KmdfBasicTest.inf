@@ -1,0 +1,56 @@
+; KmdfBasicTest.inf - optional installation file.
+;
+; Not required for userspace-ntos Driver Host testing.
+; Included as a convenience for WDK build/signing experiments.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/04/2026,0.1.0.0
+CatalogFile=KmdfBasicTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KmdfBasicTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\KmdfBasicTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+KmdfBasicTest.sys
+
+[Install.NT.Services]
+AddService=KmdfBasicTest,0x00000002,KmdfBasicTest_Service
+
+[KmdfBasicTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\KmdfBasicTest.sys
+
+[Install.NT.Wdf]
+KmdfService = KmdfBasicTest, KmdfBasicTest_wdfsect
+
+[KmdfBasicTest_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+ProviderName="KmdfBasicTest"
+ManufacturerName="KmdfBasicTest"
+DeviceName="KmdfBasicTest KMDF Basic Runtime Test Driver"
+ServiceName="KmdfBasicTest"
+DiskName="KmdfBasicTest Installation Disk"
