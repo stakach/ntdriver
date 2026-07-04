@@ -1,0 +1,53 @@
+; KmdfDmaInterruptTest.inf
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ProviderName%
+DriverVer=07/04/2026,0.2.0.0
+CatalogFile=KmdfDmaInterruptTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KmdfDmaInterruptTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, Root\KmdfDmaInterruptTest
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+KmdfDmaInterruptTest.sys
+
+[Install.NT.Services]
+AddService=KmdfDmaInterruptTest,0x00000002,KmdfDmaInterruptTest_Service
+
+[KmdfDmaInterruptTest_Service]
+DisplayName=%ServiceName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\KmdfDmaInterruptTest.sys
+
+[Install.NT.Wdf]
+KmdfService = KmdfDmaInterruptTest, KmdfDmaInterruptTest_wdfsect
+
+[KmdfDmaInterruptTest_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+ProviderName="KmdfDmaInterruptTest"
+ManufacturerName="KmdfDmaInterruptTest"
+DeviceName="KmdfDmaInterruptTest KMDF DMA Interrupt Runtime Test Driver"
+ServiceName="KmdfDmaInterruptTest"
+DiskName="KmdfDmaInterruptTest Installation Disk"

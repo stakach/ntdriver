@@ -28,6 +28,8 @@ jobs:
             dir: dma_pnp_power_test_driver
           - name: KmdfBasicTest
             dir: kmdf_basic_test_driver
+          - name: KmdfDmaInterruptTest
+            dir: kmdf_dma_interrupt_test_driver
 
     env:
       CONFIGURATION: Release
