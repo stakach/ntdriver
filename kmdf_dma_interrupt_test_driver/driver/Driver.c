@@ -386,15 +386,14 @@ NTSTATUS KmdfDmaEvtDeviceReleaseHardware(_In_ WDFDEVICE Device, _In_ WDFCMRESLIS
 NTSTATUS KmdfDmaEvtDeviceD0Entry(_In_ WDFDEVICE Device, _In_ WDF_POWER_DEVICE_STATE PreviousState)
 {
     PKMDF_DMA_DEVICE_CONTEXT ctx = KmdfDmaGetContext(Device);
-    NTSTATUS status;
 
     UNREFERENCED_PARAMETER(PreviousState);
 
     ctx->Powered = TRUE;
 
+    /* WdfInterruptEnable returns VOID. */
     if (ctx->Interrupt != NULL) {
-        status = WdfInterruptEnable(ctx->Interrupt);
-        if (!NT_SUCCESS(status)) return status;
+        WdfInterruptEnable(ctx->Interrupt);
     }
 
     return STATUS_SUCCESS;
