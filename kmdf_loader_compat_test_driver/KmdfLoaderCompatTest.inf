@@ -1,0 +1,62 @@
+; KmdfLoaderCompatTest.inf
+; Test-only root-enumerated KMDF driver for userspace-ntos driver-loader/KMDF-binding bring-up.
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System
+ClassGuid={4D36E97D-E325-11CE-BFC1-08002BE10318}
+Provider=%ProviderName%
+DriverVer=07/05/2026,1.0.0.0
+CatalogFile=KmdfLoaderCompatTest.cat
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KmdfLoaderCompatTest.sys = 1
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%DeviceName%=Install, ROOT\KMDFLOADERCOMPATTEST
+
+[Install.NT]
+CopyFiles=DriverCopyFiles
+
+[DriverCopyFiles]
+KmdfLoaderCompatTest.sys
+
+[Install.NT.Services]
+AddService=KmdfLoaderCompatTest,0x00000002,ServiceInstall
+
+[ServiceInstall]
+DisplayName=%ServiceDisplayName%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\KmdfLoaderCompatTest.sys
+LoadOrderGroup=Base
+
+[Install.NT.Wdf]
+KmdfService=KmdfLoaderCompatTest,KmdfLoaderCompatTest_wdfsect
+
+[KmdfLoaderCompatTest_wdfsect]
+KmdfLibraryVersion=1.11
+
+[Install.NT.HW]
+AddReg=Parameters.AddReg
+
+[Parameters.AddReg]
+HKR,Parameters,Answer,0x00010001,42
+HKR,Parameters,Greeting,0x00000000,"hello from registry"
+
+[Strings]
+ProviderName="userspace-ntos"
+ManufacturerName="userspace-ntos"
+DeviceName="KMDF Loader Compatibility Test Device"
+ServiceDisplayName="KMDF Loader Compatibility Test"
+DiskName="KmdfLoaderCompatTest Installation Disk"

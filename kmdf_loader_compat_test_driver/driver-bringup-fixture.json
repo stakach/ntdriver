@@ -1,0 +1,37 @@
+{
+  "profile": "win7_sp1_x64_nt61",
+  "service": {
+    "name": "KmdfLoaderCompatTest",
+    "imagePath": "\\SystemRoot\\System32\\drivers\\KmdfLoaderCompatTest.sys",
+    "type": 1,
+    "start": 3,
+    "errorControl": 1,
+    "parameters": {
+      "Answer": { "type": "REG_DWORD", "value": 42 },
+      "Greeting": { "type": "REG_SZ", "value": "hello from registry" }
+    }
+  },
+  "devnodes": [
+    {
+      "instanceId": "ROOT\\KMDFLOADERCOMPATTEST\\0000",
+      "hardwareIds": ["ROOT\\KMDFLOADERCOMPATTEST"],
+      "compatibleIds": ["ROOT\\KMDFLOADERCOMPATTEST"],
+      "service": "KmdfLoaderCompatTest",
+      "resources": {
+        "memory": [
+          { "base": "0x10000000", "length": "0x1000" }
+        ],
+        "interrupts": [
+          { "vector": 5, "irql": 5, "mode": "LevelSensitive", "shareDisposition": "Exclusive" }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "deviceName": "\\Device\\KmdfLoaderCompatTest",
+    "legacyPath": "\\\\.\\KmdfLoaderCompatTest",
+    "interfaceGuid": "{C4BC7D8F-780E-4D27-8D81-0F973B7E0611}",
+    "registrySeenByDriver": 1,
+    "answer": 42
+  }
+}
