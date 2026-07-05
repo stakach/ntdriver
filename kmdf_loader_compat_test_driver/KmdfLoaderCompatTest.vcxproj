@@ -14,6 +14,8 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
+    <KMDF_VERSION_MAJOR>1</KMDF_VERSION_MAJOR>
+    <KMDF_VERSION_MINOR>15</KMDF_VERSION_MINOR>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -21,6 +23,8 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>KMDF</DriverType>
+    <KMDF_VERSION_MAJOR>1</KMDF_VERSION_MAJOR>
+    <KMDF_VERSION_MINOR>15</KMDF_VERSION_MINOR>
     <PlatformToolset>WindowsKernelModeDriver10.0</PlatformToolset>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
@@ -34,14 +38,14 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
-      <PreprocessorDefinitions>_AMD64_;AMD64;WINNT=1;NTDDI_VERSION=0x06010000;_WIN32_WINNT=0x0601;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_AMD64_;AMD64;WINNT=1;NTDDI_VERSION=0x0A000000;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Native</SubSystem>
       <EntryPointSymbol>GsDriverEntry</EntryPointSymbol>
     </Link>
     <DriverSettings>
-      <TargetVersion>Windows7</TargetVersion>
+      <TargetVersion>Windows10</TargetVersion>
     </DriverSettings>
   </ItemDefinitionGroup>
   <ItemGroup>

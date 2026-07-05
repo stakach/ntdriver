@@ -45,7 +45,7 @@ LoadOrderGroup=Base
 KmdfService=KmdfLoaderCompatTest,KmdfLoaderCompatTest_wdfsect
 
 [KmdfLoaderCompatTest_wdfsect]
-KmdfLibraryVersion=1.11
+KmdfLibraryVersion=1.15
 
 [Install.NT.HW]
 AddReg=Parameters.AddReg

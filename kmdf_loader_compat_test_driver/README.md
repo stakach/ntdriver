@@ -1,6 +1,6 @@
 # KmdfLoaderCompatTest
 
-A small Windows 7-targeted KMDF driver project for testing the userspace-ntos
+A small KMDF driver project (KMDF 1.15, Windows 10 target) for testing the userspace-ntos
 `NT_DRIVER_LOADING_KMDF_BINDING_COMPAT_SPEC.md` path.
 
 The driver is intentionally ordinary KMDF, not a custom harness driver. It should bind through
@@ -131,10 +131,10 @@ scripts\build_wdk10_x64.bat
 The project sets:
 
 ```text
-NTDDI_VERSION=0x06010000
-_WIN32_WINNT=0x0601
-TargetVersion=Windows7
-KMDF library version: 1.11
+NTDDI_VERSION=0x0A000000
+_WIN32_WINNT=0x0A00
+TargetVersion=Windows10
+KMDF library version: 1.15
 ```
 
 ## Building with Windows 7 WDK build.exe
