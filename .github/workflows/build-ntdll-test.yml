@@ -1,0 +1,55 @@
+name: Build ntdll-only Test EXE
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    defaults:
+      run:
+        working-directory: ntdll_only_version_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # This is a plain userspace PE (no WDK). It needs a full x64 MSVC
+      # developer environment so the project's own build script can find
+      # lib.exe / cl.exe / link.exe on PATH.
+      - name: Set up MSVC x64 developer environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build (project build script)
+        shell: cmd
+        run: build_msvc_x64.bat
+
+      - name: Verify output and imports
+        shell: pwsh
+        run: |
+          $exe = "build\ntdll_only_version_test.exe"
+          if (-not (Test-Path $exe)) { throw "$exe not built" }
+          Write-Host "Built $exe ($((Get-Item $exe).Length) bytes)"
+
+          # The whole point of this test binary: it must import ntdll.dll ONLY.
+          $imports = & dumpbin /nologo /imports $exe | Out-String
+          Write-Host $imports
+          $dlls = @([regex]::Matches($imports, '(?im)^\s{4}(\S+\.dll)') |
+            ForEach-Object { $_.Groups[1].Value.ToLower() } | Sort-Object -Unique)
+          Write-Host "Imported DLLs: $($dlls -join ', ')"
+          if ($dlls.Count -ne 1 -or $dlls[0] -ne 'ntdll.dll') {
+            throw "Expected to import ntdll.dll only, but found: $($dlls -join ', ')"
+          }
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ntdll_only_version_test
+          path: ntdll_only_version_test/build/ntdll_only_version_test.exe
+          if-no-files-found: error
