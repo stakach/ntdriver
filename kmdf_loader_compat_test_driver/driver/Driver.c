@@ -257,8 +257,8 @@ static VOID KlctFillInfo(_In_ PDEVICE_CONTEXT Ctx, _Out_ PKLCT_INFO Info)
     Info->Signature = KLCT_SIGNATURE;
     Info->VersionMajor = KLCT_VERSION_MAJOR;
     Info->VersionMinor = KLCT_VERSION_MINOR;
-    Info->KmdfMajor = WDF_MAJOR_VERSION;
-    Info->KmdfMinor = WDF_MINOR_VERSION;
+    Info->KmdfMajor = KMDF_VERSION_MAJOR;
+    Info->KmdfMinor = KMDF_VERSION_MINOR;
     Info->RegistryAnswer = Ctx->RegistryAnswer;
     Info->SeenByDriverWritten = Ctx->SeenByDriverWritten;
     Info->DeviceAddCount = Ctx->DeviceAddCount;

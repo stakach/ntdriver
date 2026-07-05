@@ -55,7 +55,7 @@
     <ClInclude Include="driver\KmdfLoaderCompatTest.h" />
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="KmdfLoaderCompatTest.inf" />
+    <None Include="KmdfLoaderCompatTest.inf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
