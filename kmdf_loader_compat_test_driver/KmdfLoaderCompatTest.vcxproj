@@ -40,10 +40,6 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <PreprocessorDefinitions>_AMD64_;AMD64;WINNT=1;NTDDI_VERSION=0x0A000000;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <SubSystem>Native</SubSystem>
-      <EntryPointSymbol>GsDriverEntry</EntryPointSymbol>
-    </Link>
     <DriverSettings>
       <TargetVersion>Windows10</TargetVersion>
     </DriverSettings>

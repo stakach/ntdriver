@@ -28,12 +28,16 @@ jobs:
             dir: dma_pnp_power_test_driver
           - name: KmdfBasicTest
             dir: kmdf_basic_test_driver
+            kmdf: true
           - name: KmdfDmaInterruptTest
             dir: kmdf_dma_interrupt_test_driver
+            kmdf: true
           - name: KmdfInterfaceRegistryTest
             dir: kmdf_interface_registry_test_driver
+            kmdf: true
           - name: KmdfLoaderCompatTest
             dir: kmdf_loader_compat_test_driver
+            kmdf: true
 
     env:
       CONFIGURATION: Release
@@ -77,6 +81,25 @@ jobs:
           Write-Host "Build output directory: $dir"
           Get-ChildItem $dir | Format-Table Name,Length
           "dir=$dir" >> $env:GITHUB_OUTPUT
+
+      # A real KMDF driver must bind through the KMDF loader: its image imports
+      # wdfldr.sys (WdfVersionBind sets up the WDF function table at load). If the
+      # entry point is misconfigured (e.g. GsDriverEntry instead of FxDriverEntry),
+      # the driver silently bypasses that path and this import disappears.
+      - name: Verify KMDF loader binding (wdfldr.sys import)
+        if: ${{ matrix.kmdf }}
+        shell: pwsh
+        run: |
+          $sys = "${{ steps.out.outputs.dir }}\${{ matrix.name }}.sys"
+          $dumpbin = Get-ChildItem "C:\Program Files\Microsoft Visual Studio\2022" -Recurse -Filter dumpbin.exe -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+          if (-not $dumpbin) { throw "dumpbin.exe not found" }
+          $imports = & $dumpbin.FullName /nologo /imports $sys | Out-String
+          if ($imports -notmatch '(?i)wdfldr\.sys') {
+            Write-Host $imports
+            throw "$sys does not import wdfldr.sys - KMDF driver is bypassing the KMDF loader path"
+          }
+          Write-Host "OK: ${{ matrix.name }}.sys imports wdfldr.sys (binds through the KMDF loader)"
 
       # Assemble a clean package directory: driver binary + INF, then generate
       # the security catalog (.cat) from the INF with the WDK's Inf2Cat tool.
