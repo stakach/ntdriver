@@ -18,6 +18,7 @@
     <TargetVersion>Windows10</TargetVersion>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>UMDF</DriverType>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <UMDF_VERSION_MAJOR>2</UMDF_VERSION_MAJOR>
     <UMDF_VERSION_MINOR>15</UMDF_VERSION_MINOR>
     <PlatformToolset>WindowsUserModeDriver10.0</PlatformToolset>
@@ -29,6 +30,7 @@
     <TargetVersion>Windows10</TargetVersion>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverType>UMDF</DriverType>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <UMDF_VERSION_MAJOR>2</UMDF_VERSION_MAJOR>
     <UMDF_VERSION_MINOR>15</UMDF_VERSION_MINOR>
     <PlatformToolset>WindowsUserModeDriver10.0</PlatformToolset>
