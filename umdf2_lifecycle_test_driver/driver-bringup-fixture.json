@@ -1,0 +1,32 @@
+{
+  "profile": "win8_1_x64_nt63_umdf2",
+  "note": "UMDF v2 is Windows 8.1+ style. Keep the kernel/native profile separate from UMDF2 profile if needed.",
+  "service": {
+    "name": "Umdf2LifecycleTest",
+    "type": "umdf2_user_mode_driver",
+    "reflector": "WUDFRd",
+    "imagePath": "\\SystemRoot\\System32\\UMDF\\Umdf2LifecycleTest.dll",
+    "start": 3,
+    "parameters": {
+      "Answer": { "type": "REG_DWORD", "value": 42 }
+    }
+  },
+  "devnodes": [
+    {
+      "instancePath": "ROOT\\UMDF2_LIFECYCLE_TEST\\0001",
+      "enumerator": "ROOT",
+      "deviceId": "UMDF2_LIFECYCLE_TEST",
+      "instanceId": "0001",
+      "hardwareIds": ["ROOT\\UMDF2_LIFECYCLE_TEST"],
+      "compatibleIds": ["ROOT\\USERSPACE_NTOS_UMDF2_TEST_DEVICE"],
+      "service": "WUDFRd",
+      "umdfService": "Umdf2LifecycleTest",
+      "classGuid": "{78A1C341-4539-11d3-B88D-00C04FAD5171}",
+      "interfaces": ["{5F4D7E3B-8C43-4B9A-9E47-9E7E3DF57D22}"],
+      "properties": {
+        "DeviceDesc": "UMDF2 Lifecycle Test Device",
+        "FriendlyName": "UMDF2 Lifecycle Test"
+      }
+    }
+  ]
+}

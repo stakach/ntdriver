@@ -1,0 +1,1 @@
+Generated sample code for userspace-ntos testing. Use and modify freely.

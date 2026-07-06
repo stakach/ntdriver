@@ -39,8 +39,8 @@ jobs:
             dir: kmdf_loader_compat_test_driver
             kmdf: true
           # UMDF v2 driver: builds to a user-mode .dll, not a kernel .sys.
-          - name: UmdfLifecycleTest
-            dir: umdf_lifecycle_test_driver
+          - name: Umdf2LifecycleTest
+            dir: umdf2_lifecycle_test_driver
             ext: dll
 
     env:

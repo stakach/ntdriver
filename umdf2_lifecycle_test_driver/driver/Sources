@@ -1,0 +1,6 @@
+# Legacy build.exe style file included for reference only.
+# UMDF v2 is normally built with MSBuild/Visual Studio WDK projects.
+TARGETNAME=Umdf2LifecycleTest
+TARGETTYPE=DYNLINK
+UMDF_VERSION_MAJOR=2
+SOURCES=Driver.c
