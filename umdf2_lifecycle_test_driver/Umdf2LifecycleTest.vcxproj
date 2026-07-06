@@ -48,9 +48,11 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(UmdfLib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>WdfDriverStubUm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- WdfDriverStubUm provides the UMDF entry (FxDriverEntryUm); its stub
+           references DbgPrintEx which ntdll exports. -->
+      <AdditionalDependencies>WdfDriverStubUm.lib;ntdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>driver\Umdf2LifecycleTest.def</ModuleDefinitionFile>
-      <EntryPointSymbol>FxDriverEntry</EntryPointSymbol>
+      <EntryPointSymbol>FxDriverEntryUm</EntryPointSymbol>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
