@@ -9,55 +9,56 @@
     <ProjectGuid>{0F2D64ED-DB2D-4C16-A2C3-4F7420DD0F18}</ProjectGuid>
     <RootNamespace>Umdf2LifecycleTest</RootNamespace>
     <TargetName>Umdf2LifecycleTest</TargetName>
-    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
 
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetVersion>Windows10</TargetVersion>
-    <ConfigurationType>Driver</ConfigurationType>
-    <DriverType>UMDF</DriverType>
-    <DriverTargetPlatform>Universal</DriverTargetPlatform>
-    <UMDF_VERSION_MAJOR>2</UMDF_VERSION_MAJOR>
-    <UMDF_VERSION_MINOR>15</UMDF_VERSION_MINOR>
-    <PlatformToolset>WindowsUserModeDriver10.0</PlatformToolset>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetVersion>Windows10</TargetVersion>
-    <ConfigurationType>Driver</ConfigurationType>
-    <DriverType>UMDF</DriverType>
-    <DriverTargetPlatform>Universal</DriverTargetPlatform>
-    <UMDF_VERSION_MAJOR>2</UMDF_VERSION_MAJOR>
-    <UMDF_VERSION_MINOR>15</UMDF_VERSION_MINOR>
-    <PlatformToolset>WindowsUserModeDriver10.0</PlatformToolset>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
+  <!-- The Chocolatey WDK's MSBuild integration only wires up the WDF headers/libs
+       for ConfigurationType=Driver, which (for UMDF) compiles but never links a
+       DLL. So build a plain DynamicLibrary (which does link) and point the
+       compiler/linker at the WDK's UMDF 2.15 headers and import lib directly. -->
+  <PropertyGroup>
+    <WdkRoot>C:\Program Files (x86)\Windows Kits\10</WdkRoot>
+    <UmdfInc>$(WdkRoot)\Include\wdf\umdf\2.15</UmdfInc>
+    <UmdfLib>$(WdkRoot)\Lib\wdf\umdf\x64\2.15</UmdfLib>
+  </PropertyGroup>
+
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(UmdfInc);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UMDF_VERSION_MAJOR=2;UMDF_VERSION_MINOR=15;UMDF_USING_NTSTATUS;_WIN32_WINNT=0x0A00;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <!-- ConfigurationType=Driver+UMDF compiles but does not link a DLL on its
-         own; the explicit link config (FxDriverEntry entry + the UMDF stub lib)
-         is what produces the user-mode driver .dll. -->
     <Link>
-      <ModuleDefinitionFile>driver\Umdf2LifecycleTest.def</ModuleDefinitionFile>
+      <AdditionalLibraryDirectories>$(UmdfLib);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>WdfDriverStubUm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>driver\Umdf2LifecycleTest.def</ModuleDefinitionFile>
       <EntryPointSymbol>FxDriverEntry</EntryPointSymbol>
+      <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
 
   <ItemGroup>
     <ClCompile Include="driver\Driver.c" />
     <ClInclude Include="driver\Umdf2LifecycleTest.h" />
+    <None Include="driver\Umdf2LifecycleTest.def" />
     <None Include="Umdf2LifecycleTest.inf" />
     <None Include="README.md" />
   </ItemGroup>
