@@ -38,6 +38,10 @@ jobs:
           - name: KmdfLoaderCompatTest
             dir: kmdf_loader_compat_test_driver
             kmdf: true
+          # UMDF v2 driver: builds to a user-mode .dll, not a kernel .sys.
+          - name: UmdfLifecycleTest
+            dir: umdf_lifecycle_test_driver
+            ext: dll
 
     env:
       CONFIGURATION: Release
@@ -74,9 +78,9 @@ jobs:
         id: out
         shell: pwsh
         run: |
-          $sys = Get-ChildItem -Path "${{ matrix.dir }}" -Recurse -Filter "${{ matrix.name }}.sys" |
+          $sys = Get-ChildItem -Path "${{ matrix.dir }}" -Recurse -Filter "${{ matrix.name }}.${{ matrix.ext || 'sys' }}" |
             Sort-Object LastWriteTime -Descending | Select-Object -First 1
-          if (-not $sys) { throw "${{ matrix.name }}.sys not found after build" }
+          if (-not $sys) { throw "${{ matrix.name }}.${{ matrix.ext || 'sys' }} not found after build" }
           $dir = $sys.DirectoryName
           Write-Host "Build output directory: $dir"
           Get-ChildItem $dir | Format-Table Name,Length
@@ -108,7 +112,7 @@ jobs:
         run: |
           $pkg = Join-Path $env:GITHUB_WORKSPACE 'package'
           New-Item -ItemType Directory -Force -Path $pkg | Out-Null
-          Copy-Item "${{ steps.out.outputs.dir }}\${{ matrix.name }}.sys" $pkg
+          Copy-Item "${{ steps.out.outputs.dir }}\${{ matrix.name }}.${{ matrix.ext || 'sys' }}" $pkg
           Copy-Item "${{ steps.out.outputs.dir }}\${{ matrix.name }}.pdb" $pkg -ErrorAction SilentlyContinue
           Copy-Item "${{ matrix.dir }}\${{ matrix.name }}.inf" $pkg
 
@@ -142,7 +146,7 @@ jobs:
 
           & $signtool.FullName sign /fd SHA256 /sha1 $cert.Thumbprint `
             /t http://timestamp.digicert.com `
-            "$pkg\${{ matrix.name }}.sys" "$pkg\${{ matrix.name }}.cat"
+            "$pkg\${{ matrix.name }}.${{ matrix.ext || 'sys' }}" "$pkg\${{ matrix.name }}.cat"
           if ($LASTEXITCODE -ne 0) { throw "signtool failed with exit code $LASTEXITCODE" }
 
           # Export the public cert so it can be imported on a test machine.
@@ -153,7 +157,7 @@ jobs:
         with:
           name: ${{ matrix.name }}-driver
           path: |
-            package/${{ matrix.name }}.sys
+            package/${{ matrix.name }}.${{ matrix.ext || 'sys' }}
             package/${{ matrix.name }}.pdb
             package/${{ matrix.name }}.inf
             package/${{ matrix.name }}.cat
