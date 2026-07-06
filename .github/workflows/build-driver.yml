@@ -61,16 +61,6 @@ jobs:
         shell: pwsh
         run: choco install windowsdriverkit11 --no-progress -y
 
-      - name: (UMDF) Show WDK WDF include/lib layout
-        if: ${{ matrix.ext == 'dll' }}
-        shell: pwsh
-        run: |
-          $root = "C:\Program Files (x86)\Windows Kits\10"
-          Write-Host "=== Include\wdf\umdf ==="; Get-ChildItem "$root\Include\wdf\umdf" -ErrorAction SilentlyContinue | Select-Object Name
-          Write-Host "=== Lib\wdf\umdf\x64 ==="; Get-ChildItem "$root\Lib\wdf\umdf\x64" -ErrorAction SilentlyContinue | Select-Object Name
-          Write-Host "=== wdf.h locations ==="; Get-ChildItem "$root\Include\wdf" -Recurse -Filter wdf.h -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-          Write-Host "=== WdfDriverStubUm.lib locations ==="; Get-ChildItem "$root\Lib\wdf" -Recurse -Filter WdfDriverStubUm.lib -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-
       - name: Build ${{ matrix.name }}
         shell: pwsh
         run: |
