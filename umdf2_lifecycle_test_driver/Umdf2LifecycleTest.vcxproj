@@ -45,6 +45,14 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
+    <!-- ConfigurationType=Driver+UMDF compiles but does not link a DLL on its
+         own; the explicit link config (FxDriverEntry entry + the UMDF stub lib)
+         is what produces the user-mode driver .dll. -->
+    <Link>
+      <ModuleDefinitionFile>driver\Umdf2LifecycleTest.def</ModuleDefinitionFile>
+      <AdditionalDependencies>WdfDriverStubUm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>FxDriverEntry</EntryPointSymbol>
+    </Link>
   </ItemDefinitionGroup>
 
   <ItemGroup>
