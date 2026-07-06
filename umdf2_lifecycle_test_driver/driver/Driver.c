@@ -1,7 +1,10 @@
 #include <windows.h>
-#include <initguid.h>
 #include <wdf.h>
 #include "Umdf2LifecycleTest.h"
+// initguid.h must come after headers that declare system GUIDs (e.g. winioctl.h
+// via the header above); otherwise those GUIDs get allocated storage here and
+// collide (C2374). With it last, only our DEFINE_GUID below gets storage.
+#include <initguid.h>
 
 // {5F4D7E3B-8C43-4B9A-9E47-9E7E3DF57D22}
 DEFINE_GUID(GUID_DEVINTERFACE_UMDF2_LIFECYCLE_TEST,
